@@ -6,8 +6,7 @@
 
 #define GAME_MAX_PADS 1
 
-// Use int for running (C++98 style)
-int running = 1;
+bool running = true;
 
 // Callback function for system utilities
 extern "C" void sysutil_callback(const uint64_t status,
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]) {
                 ioPadGetData(i, &padData);
 
                 if (padData.BTN_START) {
-                    running = 0;
+                    running = false;
                 }
             }
         }
