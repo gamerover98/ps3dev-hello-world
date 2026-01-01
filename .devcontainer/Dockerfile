@@ -1,45 +1,46 @@
 FROM mcr.microsoft.com/devcontainers/cpp:1-debian-12
 
-ARG REINSTALL_CMAKE_VERSION_FROM_SOURCE="none"
-
 ENV PS3DEV=/usr/local/ps3dev
 ENV PSL1GHT=${PS3DEV}
 ENV PATH=${PATH}:${PS3DEV}/bin:${PS3DEV}/ppu/bin:${PS3DEV}/spu/bin
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Optionally install the cmake for vcpkg
-COPY ./reinstall-cmake.sh /tmp/
+USER root
 
-RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
-        chmod +x /tmp/reinstall-cmake.sh && /tmp/reinstall-cmake.sh ${REINSTALL_CMAKE_VERSION_FROM_SOURCE}; \
-    fi \
-    && rm -f /tmp/reinstall-cmake.sh 
-
-RUN \
-  apt-get update && \
-  apt-get install -y \
+RUN apt-get update && apt-get install -y \
+    git \
     autoconf \
+    automake \
     bison \
+    flex \
     build-essential \
     ca-certificates \
-    flex \
-    git \
+    gcc \
     libelf-dev \
-    libgmp-dev \
-    libncurses-dev \
-    libssl-dev \
-    libtool-bin \
-    pkg-config \
-    python-dev-is-python3 \
+    make \
     texinfo \
+    libncurses-dev \
+    patch \
+    python-is-python3 \
+    subversion \
     wget \
-    zlib1g-dev && \
-  apt-get clean && \
-  rm -rf /var/lib/{apt,dpkg,cache,log}/
+    zlib1g-dev \
+    libtool \
+    libtool-bin \
+    python-dev-is-python3 \
+    bzip2 \
+    libgmp3-dev \
+    libgmp-dev \
+    zlib1g-dev \
+    pkg-config \
+    g++ \
+    libssl-dev \
+    clang \
+    && rm -rf /var/lib/apt/lists/*
 
-# [Optional] Uncomment this section to install additional vcpkg ports.
-# RUN su vscode -c "${VCPKG_ROOT}/vcpkg install <your-port-name-here>"
-
-# [Optional] Uncomment this section to install additional packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+RUN mkdir -p ${PS3DEV} && \
+    git clone https://github.com/ps3dev/ps3toolchain.git /tmp/ps3toolchain && \
+    cd /tmp/ps3toolchain && \
+    chmod +x toolchain.sh && \
+    ./toolchain.sh && \
+    rm -rf /tmp/ps3toolchain
